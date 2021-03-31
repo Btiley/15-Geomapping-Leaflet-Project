@@ -58,6 +58,6 @@ d3.json(url, function(response) {
 
 //Legend to show gradient of magnitudes and values.
 
-
+//Loop through all JSON objects to log each parameter. 
 });
 
