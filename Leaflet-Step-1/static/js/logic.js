@@ -78,31 +78,38 @@ d3.json(url, function(response) {
 
           else{
             var circle = genCircle(colors[5])}
-          });
+      
+      });
 
       //LEGEND
       //----------------------------------------------------
+      //Function for legend colors
+      function getColor(d) {
+      return d > 5 ?  'darkred':
+            d > 4  ?  'red' :
+            d > 3  ?  'orange' :
+            d > 2  ?  'yellow' :
+            d > 1  ?  'green' :
+                      'lightgreen';
+    }
+      
       //Set legend Position
-      var legend = L.control({ position: "bottomleft", backgroundcolor: "white" });
+      var legend = L.control({ position: "bottomleft"});
       legend.onAdd = function() {
-          var div = L
-            .DomUtil
-            .create("div", "info legend");
+          var div = L.DomUtil.create("div", "info legend");
           var grades = [0, 1, 2, 3, 4, 5];
-          var colors =  ['#98EE00','green','yellow','orange','red','darkred'];
           
-            
       // Set Legend Content 
         for (var i = 0; i<grades.length; i++) {
-          console.log(colors[i]);
+          console.log(getColor(grades[i]))
           div.innerHTML +=
-          '<i style= " background:' + colors[i] + ' " ></i>' + grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
+          '<b>' + getColor(grades[i] + 1) + "</b>" + " " + grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
           }
         return div;
      
         };
       legend.addTo(myMap)
+
+    
    
   });
-
-  // div.innerHTML +="<i style='background: " + colors[0] + "'></i> " +grades[0] + (grades[0 + 1] ? "&ndash;" + grades[0 + 1] + "<br>" : "+");
