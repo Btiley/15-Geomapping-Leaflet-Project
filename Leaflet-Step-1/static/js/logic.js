@@ -1,11 +1,10 @@
 //CREATE INITAL MAP FUNCTION
 //----------------------------------------------------
+//NY Coords: 38.575764, -121.478851
+//Map Params (Centred on Chad to encompass entire map)
+var mapCentre = [15.4542, 18.7322];
+var mapZoom = 2;
 
-//Map Params (Centred on West Coast USA)
-var mapCentre = [38.575764, -121.478851]
-var mapZoom = 5
-
-function createMap(){
 // Initialize map object
 var myMap = L.map("map", {
     center: mapCentre,
@@ -31,98 +30,77 @@ var myMap = L.map("map", {
 var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
 
 d3.json(url, function(response) {
-    var lat = response["features"][0]["geometry"]["coordinates"][1];  
-    var lng = response["features"][0]["geometry"]["coordinates"][0];
+        
+        var Quake = response["features"]
+
+        Quake.forEach(function(data){
+          
+          var lat = data["geometry"]["coordinates"][1];  
+          var lng = data["geometry"]["coordinates"][0];
+          var mag = data["properties"]["mag"];
+          var loc = data["properties"]["place"];
+          var date = data["properties"]["time"];
+
+      //Create Markers, Tooltips and Legend. 
+      //----------------------------------------------------
+
+      //MARKERS
+      //----------------------------------------------------
+
+      //Function to create circle, takes input of colour and radius = magnitude
+        var colors = ["lightgreen","green","yellow","orange","red","darkred"];
+        function genCircle(col) {
+          var circle = L.circle([lat, lng], {
+            color: col,
+            fillColor: col,
+            fillOpacity: 0.75,
+            radius: (mag *25000)
+          }).addTo(myMap);
+          
+          circle.bindPopup(`<b> Time: </b> ${date} <br> <b> Magnitude :</b> ${mag} <br> <b> Place :</b> ${loc} <br> <b> Coordinates :</b>: ${lat},${lng}`)
+        }
+
+      //Colour changes based on degree of magnitude. 
+          if (mag < 1) { 
+            var circle = genCircle(colors[0])}
+
+          else if (mag >= 1, mag < 2) {
+            var circle = genCircle(colors[1])}
+
+          else if(mag >= 2, mag < 3) {
+            var circle = genCircle(colors[2])}
+
+          else if(mag >= 3, mag < 4) {
+            var circle = genCircle(colors[3])} 
+
+          else if(mag >= 4, mag < 5){
+            var circle = genCircle(colors[4])}
+
+          else{
+            var circle = genCircle(colors[5])}
+          });
+
+      //LEGEND
+      //----------------------------------------------------
+      //Set legend Position
+      var legend = L.control({ position: "bottomleft", backgroundcolor: "white" });
+      legend.onAdd = function() {
+          var div = L
+            .DomUtil
+            .create("div", "info legend");
+          var grades = [0, 1, 2, 3, 4, 5];
+          var colors =  ["lightgreen","green","yellow","orange","red","darkred"];
+          
+            
+      // Set Legend Content 
+        for (var i = 0; i<grades.length; i++) {
+          div.innerHTML +=
+          colors[i] + " " + grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
+          }
+        return div;
     
-    var mag = 3
-    var loc = response["features"][0]["properties"]["place"];
+      };
+    
+      legend.addTo(myMap)
+   });
 
-    console.log(`The Earthquake occured ${loc} (${lng},${lat}) and had a magnitude of ${mag}`);
-//response["features"][0]["properties"]["mag"];
-//Create Markers, Tooltips and Legend. 
-//----------------------------------------------------
-
-//MARKERS
-//----------------------------------------------------
-//Circle markers with radius = mag, gradient colour, darker = higher mag.
-//Mag Ranges: 0-1 Green ,1-2 LimeGreen,2-3 Yellow,3-4 Orange ,4-5 Dark Orange, 5+ Red
-//If mag < 1, mag >= 1 < 2, mag >= 2 < 3, mag >= 3 < 4, mag >= 4 < 5, >= 5
-function genCircle(col) {
-  L.circle([lat, lng], {
-    color: col,
-    fillColor: col,
-    fillOpacity: 0.75,
-    radius: (mag *50000)
-  }).addTo(myMap);
-
-}
-if (mag < 1) {
-  console.log("mag < 1");
-  var circle = genCircle("lightgreen")
-  //circle.bindPopup(`<b>Magnitude</b>: ${mag} <br> <b>Coordinates</b>: ${lat},${lng} <br> <b>Place</b>: ${loc}`);
-
-}
-else if (mag >= 1, mag < 2) {
-  console.log("mag >= 1 < 2");
-  var circle = genCircle("green")
-  //circle.bindPopup(`<b>Magnitude</b>: ${mag} <br> <b>Coordinates</b>: ${lat},${lng} <br> <b>Place</b>: ${loc}`);
-
-}
-else if(mag >= 2, mag < 3) {
-  console.log("mag >= 2 < 3");
-  var circle = genCircle("yellow")
-  //circle.bindPopup(`<b>Magnitude</b>: ${mag} <br> <b>Coordinates</b>: ${lat},${lng} <br> <b>Place</b>: ${loc}`);
-
-}
-else if(mag >= 3, mag < 4) {
-  console.log("mag >= 3 < 4")
-  
-  var circle = genCircle("orange")
-  
-  //circle.bindPopup(`<b>Magnitude</b>: ${mag} <br> <b>Coordinates</b>: ${lat},${lng} <br> <b>Place</b>: ${loc}`);
-
-}
-else if(mag >= 4, mag < 5){
-  console.log("mag >= 4 < 5")  
-  
-  var circle = genCircle("darkorange")
-  
-  //circle.bindPopup(`<b>Magnitude</b>: ${mag} <br> <b>Coordinates</b>: ${lat},${lng} <br> <b>Place</b>: ${loc}`);
-
-}
-else{
-  console.log("mag > 5")
-  
-  var circle = genCircle("red")
-  
-  //circle.bindPopup(`<b>Magnitude</b>: ${mag} <br> <b>Coordinates</b>: ${lat},${lng} <br> <b>Place</b>: ${loc}`);
-
-}
-
-// var circle = L.circle([lat, lng], {
-//   color: "green",
-//   fillColor: "green",
-//   fillOpacity: 0.75,
-//   radius: (mag *50000) 
-// }).addTo(myMap);
-
-// Binding a pop-up to our marker 
-
-
-
-});
-
-//TOOL TIP
-//----------------------------------------------------
-
-//Tool tips on Mouse over with local, lat/long and magnitude.
-
-//LEGEND
-//----------------------------------------------------
-
-//Legend to show gradient of magnitudes and values.
-
-//Loop through all JSON objects to log each parameter. 
-};
-
-createMap();
