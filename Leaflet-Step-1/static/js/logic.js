@@ -31,9 +31,9 @@ var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geo
 
 d3.json(url, function(response) {
         
-        var Quake = response["features"]
+        var earthquake = response["features"]
 
-        Quake.forEach(function(data){
+        earthquake.forEach(function(data){
           
           var lat = data["geometry"]["coordinates"][1];  
           var lng = data["geometry"]["coordinates"][0];
@@ -89,18 +89,17 @@ d3.json(url, function(response) {
             .DomUtil
             .create("div", "info legend");
           var grades = [0, 1, 2, 3, 4, 5];
-          var colors =  ["lightgreen","green","yellow","orange","red","darkred"];
-          
+          var colors =  ['lightgreen','green','yellow','orange','red','darkred'];
             
       // Set Legend Content 
         for (var i = 0; i<grades.length; i++) {
           div.innerHTML +=
-          colors[i] + " " + grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
+          "<i style='background:" + colors[i] + "'></i>" + grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
           }
         return div;
     
-      };
-    
+        };
       legend.addTo(myMap)
-   });
+   
+  });
 
